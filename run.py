@@ -1,219 +1,45 @@
 import os
-import re
-from datetime import datetime
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
-from markdown import markdown
-from markupsafe import Markup
-from pygments import highlight
-from pygments.formatters.html import HtmlFormatter
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
-from pygments.lexers import get_lexer_by_name
+from flask import Flask
+from werkzeug.security import generate_password_hash
+
+from modules.blog import blog_routes
+from modules.context_processors import context_processors
+from modules.filters import filters
+from modules.login_manager import login_manager, login_routes
+from modules.modals import db
+from modules.routes import page_routes
 
 load_dotenv()
-app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///db.sqlite'
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'change_me'
-app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME') or 'admin'
-app.config['ADMIN_PASSWORD'] = generate_password_hash(os.environ.get('ADMIN_PASSWORD') or 'admin')
-app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL') or 'admin@site.com'
-app.config['GITHUB_PAGE'] = os.environ.get('GITHUB_PAGE') or 'github.com/username/repo'
-app.config['DISCORD_INVITE'] = os.environ.get('DISCORD_INVITE') or 'discord.gg/invite'
-app.config['CODEPEN_PAGE'] = os.environ.get('CODEPEN_PAGE') or 'codepen.io/username'
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-
-db = SQLAlchemy(app)
 
 
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(100))
-    content = db.Column(db.Text)
-    date = db.Column(db.DateTime, default = datetime.utcnow)
-    author = db.Column(db.String(100), default = app.config['ADMIN_USERNAME'])
+def setup_app(app):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///db.sqlite'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'change_me'
+    app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME') or 'admin'
+    app.config['ADMIN_PASSWORD'] = generate_password_hash(os.environ.get('ADMIN_PASSWORD') or 'admin')
+    app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL') or 'admin@site.com'
+    app.config['GITHUB_PAGE'] = os.environ.get('GITHUB_PAGE') or 'github.com/username/repo'
+    app.config['DISCORD_INVITE'] = os.environ.get('DISCORD_INVITE') or 'discord.gg/invite'
+    app.config['CODEPEN_PAGE'] = os.environ.get('CODEPEN_PAGE') or 'codepen.io/username'
+    app.register_blueprint(login_routes)
+    app.register_blueprint(blog_routes)
+    app.register_blueprint(page_routes)
+    app.register_blueprint(filters)
+    app.register_blueprint(context_processors)
+    with app.app_context():
+        login_manager.init_app(app)
+        db.init_app(app)
+        db.create_all()
 
-    def __init__(self, title, content):
-        self.title = title
-        self.content = content
-
-
-class Admin(UserMixin):
-    def __init__(self, username, password):
-        self.id = 1
-        self.username = username
-        self.password = generate_password_hash(password, method = 'pbkdf2:sha256:1000', salt_length = 8)
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
-
-    def __repr__(self):
-        return 'Admin ' + str(self.id)
-
-    def get_id(self):
-        return self.id
-
-    @property
-    def is_authenticated(self):
-        return True
-
-
-with app.app_context():
-    db.create_all()
-
-
-@login_manager.user_loader
-def load_user(_):
-    return Admin(app.config['ADMIN_USERNAME'], app.config['ADMIN_PASSWORD'])
-
-
-@login_manager.unauthorized_handler
-def unauthorized():
-    return redirect(url_for('login'))
-
-
-@app.route('/')
-def index():
-    return render_template('pages/index.html')
-
-
-@app.route('/blog')
-def blog():
-    posts = Post.query.order_by(Post.date.desc()).all()
-    return render_template('pages/blog.html', posts = posts)
-
-
-@app.route('/post/<int:post_id>')
-def post(post_id):
-    return render_template('blog/post.html', post = Post.query.get_or_404(post_id))
-
-
-# CREATE POST
-@app.route('/post/create', methods = ['GET', 'POST'])
-@login_required
-def create():
-    if request.method == 'POST':
-        post = Post(request.form['title'], request.form['content'])
-        if request.form['title'] and request.form['content']:
-            db.session.add(post)
-            db.session.commit()
-            post_id = Post.query.order_by(Post.date.desc()).first().id
-            return redirect(url_for('post', post_id = post_id))
-        else:
-            return render_template('blog/update.html', post = post, error = 'Title and content are required')
-    return render_template('blog/create.html')
-
-
-@app.route('/post/update/<int:post_id>', methods = ['GET', 'POST'])
-@login_required
-def update(post_id):
-    post = Post.query.get_or_404(post_id)
-    if request.method == 'POST':
-        post.title = request.form['title']
-        post.content = request.form['content']
-        db.session.commit()
-        return redirect(url_for('post', post_id = post_id))
-    return render_template('blog/update.html', post = post)
-
-
-@app.route('/post/delete/<int:post_id>')
-@login_required
-def delete(post_id):
-    post = Post.query.get_or_404(post_id)
-    db.session.delete(post)
-    db.session.commit()
-    return redirect(url_for('blog'))
-
-
-@app.route('/about')
-def about():
-    return render_template('pages/about.html')
-
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('pages/dashboard.html')
-
-
-@app.route('/login', methods = ['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == app.config['ADMIN_USERNAME'] and check_password_hash(app.config['ADMIN_PASSWORD'], password):
-            if login_user(Admin(username, password)):
-                return redirect(url_for('dashboard'))
-        return redirect(url_for('login', failed = True))
-    return render_template('screens/login.html')
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-
-@app.template_filter('markdown')
-def highlight_filter(s):
-    pattern = re.compile(r'```(\w+)?\s*([\s\S]+?)\s*```')
-
-    def repl(match):
-        lang = match.group(1)
-        code = match.group(2)
-        if lang:
-            return highlight(code, get_lexer_by_name(lang), HtmlFormatter())
-        else:
-            return highlight(code, get_lexer_by_name('text'), HtmlFormatter())
-
-    formatted = pattern.sub(repl, s)
-    return Markup(markdown(formatted))
-
-
-@app.context_processor
-def num_posts():
-    return dict(num_posts = Post.query.count())
-
-
-@app.context_processor
-def github_page():
-    return dict(github_page = app.config['GITHUB_PAGE'])
-
-
-@app.context_processor
-def codepen_page():
-    return dict(codepen_page = app.config['CODEPEN_PAGE'])
-
-
-@app.context_processor
-def admin_username():
-    return dict(admin_username = app.config['ADMIN_USERNAME'])
-
-
-@app.context_processor
-def admin_email():
-    return dict(admin_email = app.config['ADMIN_EMAIL'])
-
-
-@app.context_processor
-def most_recent_post():
-    return dict(most_recent_post = url_for('post', post_id = Post.query.order_by(Post.date.desc()).first().id))
-
-
-@app.context_processor
-def discord_invite():
-    return dict(discord_invite = app.config['DISCORD_INVITE'])
+    return app
 
 
 if __name__ == '__main__':
-    app.run(
+    setup_app(
+            app = Flask(__name__)
+    ).run(
             debug = True,
             host = '0.0.0.0',
             port = 5000,

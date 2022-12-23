@@ -1,16 +1,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/article.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/highlighted.css') }}">
 <article>
-    <h2 class="title"><a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
+    <h2 class="title"><a href="{{ url_for('blog_routes.post', post_id=post.id) }}">{{ post.title }}</a></h2>
     <small class="date">{{ post.date.strftime('%B %d, %Y') }}</small>
     <div class="content">
         <p>{{ post.content | markdown}}</p>
     </div>
-    <small class="author"><a href="{{ url_for('about') }}">By {{ post.author }}</a></small>
+    <small class="author"><a href="{{ url_for('page_routes.about') }}">By {{ post.author }}</a></small>
     {% if current_user.is_authenticated %}
     <div class="buttons">
-        <a class="button" href="{{ url_for('update', post_id=post.id) }}">Update</a>
-        <a class="button" href="{{ url_for('delete', post_id=post.id) }}">Delete</a>
+        <a class="button" href="{{ url_for('blog_routes.update', post_id=post.id) }}">Update</a>
+        <a class="button" href="{{ url_for('blog_routes.delete', post_id=post.id) }}">Delete</a>
     </div>
     {% endif %}
 </article>
