@@ -13,6 +13,13 @@ article .title {
     color: var(--colour-primary);
 }
 
+article .title a {
+    color: var(--colour-primary);
+    text-decoration: none;
+
+}
+
+
 article .content {
     font-weight: 400;
     border-top: 5px solid var(--colour-primary);

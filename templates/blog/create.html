@@ -16,6 +16,9 @@
     {% if error %}
         <small class="error">{{ error }}</small>
     {% endif %}
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="buttons">
+        <button type="submit" class="btn">Submit</button>
+        <button type="button" class="btn" onclick="window.location.href='{{ url_for('blog') }}'">Cancel</button>
+    </div>
 </form>
 {% endblock body %}

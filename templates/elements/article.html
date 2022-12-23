@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/article.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/highlighted.css') }}">
 <article>
-    <h2 class="title">{{ post.title }}</h2>
+    <h2 class="title"><a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
     <small class="date">{{ post.date.strftime('%B %d, %Y') }}</small>
     <div class="content">
         <p>{{ post.content | markdown}}</p>
