@@ -44,10 +44,6 @@ class Post(db.Model):
         self.content = content
 
 
-with app.app_context():
-    db.create_all()
-
-
 class Admin(UserMixin):
     def __init__(self, username, password):
         self.id = 1
@@ -66,6 +62,10 @@ class Admin(UserMixin):
     @property
     def is_authenticated(self):
         return True
+
+
+with app.app_context():
+    db.create_all()
 
 
 @login_manager.user_loader
@@ -206,9 +206,12 @@ def admin_email():
 def most_recent_post():
     return dict(most_recent_post = url_for('post', post_id = Post.query.order_by(Post.date.desc()).first().id))
 
+
 @app.context_processor
 def discord_invite():
     return dict(discord_invite = app.config['DISCORD_INVITE'])
+
+
 if __name__ == '__main__':
     app.run(
             debug = True,
