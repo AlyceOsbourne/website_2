@@ -1,0 +1,9 @@
+<div class="carousel">
+  <div class="carousel-button prev">&larr;</div>
+  <div class="carousel-button next">&rarr;</div>
+  {% for image in images %}
+    <div class="carousel-image">
+        <img src="{{ url_for('static', filename=image) }}" alt="Image {{ loop.index }}">
+    </div>
+    {% endfor %}
+</div>

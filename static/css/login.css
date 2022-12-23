@@ -2,9 +2,19 @@ form {
     margin: 0 auto;
     width: 400px;
     padding: 1em;
-    border: 1px solid #CCC;
+    border: 3px solid var(--colour-primary);
     border-radius: 1em;
 
+}
+
+form:before {
+    content: "Login";
+    display: block;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--colour-primary);
+    margin-bottom: 1em;
 }
 
 text-area {
@@ -21,3 +31,5 @@ text-area {
     display: flex;
     flex-direction: column;
 }
+
+

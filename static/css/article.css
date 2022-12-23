@@ -16,7 +16,11 @@ article .title {
 article .title a {
     color: var(--colour-primary);
     text-decoration: none;
-
+    transition: all 0.3s ease;
+}
+article .title a:hover {
+    text-decoration: underline;
+    color: var(--colour-secondary);
 }
 
 
@@ -30,10 +34,17 @@ article .content {
     margin: 1rem 0;
 }
 
-article .author {
+article .author a {
     color: var(--colour-primary);
     font-weight: 700;
     font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+article .author a:hover {
+    color: var(--colour-secondary);
+    text-decoration: underline;
 }
 
 article .date {
@@ -51,16 +62,3 @@ article .buttons {
     margin: 1rem 0;
 }
 
-.button {
-    text-decoration: none;
-    padding: .5rem 1rem;
-    border-radius: 5px;
-    margin: 0 1rem;
-    color: var(--colour-background);
-    background-color: var(--colour-primary);
-
-}
-
-.button:hover {
-    background-color: var(--colour-secondary);
-}

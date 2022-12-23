@@ -6,7 +6,7 @@
     <div class="content">
         <p>{{ post.content | markdown}}</p>
     </div>
-    <small class="author">By {{ post.author }}</small>
+    <small class="author"><a href="{{ url_for('about') }}">By {{ post.author }}</a></small>
     {% if current_user.is_authenticated %}
     <div class="buttons">
         <a class="button" href="{{ url_for('update', post_id=post.id) }}">Update</a>

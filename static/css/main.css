@@ -26,4 +26,19 @@ body {
     padding: 1rem 2rem;
 }
 
+.button {
+    text-decoration: none;
+    padding: .5rem 1rem;
+    border-radius: 5px;
+    margin: 0 1rem;
+    color: var(--colour-background);
+    background-color: var(--colour-primary);
+    transition: all 0.3s ease;
+
+}
+
+.button:hover {
+    background-color: var(--colour-secondary);
+}
+
 

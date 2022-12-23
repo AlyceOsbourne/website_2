@@ -1,7 +1,87 @@
 {% extends "base.html" %}
 {% block title %}About{% endblock %}
 {% block body %}
-    <div class="container">
-        <h1>About</h1>
+    <div class="landing">
+        <h1>About Me</h1>
+        <p>
+            Hi there! My name is Alyce and I am a self-taught software engineer and web developer with a love for all things tech.
+            I have spent countless hours learning a variety of programming languages and frameworks, including Java, Python, and HTML/CSS,
+            and have worked on a range of projects, from desktop applications to websites.<br>
+            I may not have a degree in computer science, but I like to think that my self-taught skills and relentless curiosity make up for it.
+
+            In my spare time, you can find me tinkering with code, trying out new technologies, or binge-watching the latest
+            tech documentaries (because let's be real, who doesn't love a good tech documentary?).<br>
+            I am a quick learner and always looking to improve my skills, so if you have a tough problem that needs solving, give me a shout!
+            I may not have all the answers, but I'm willing to give it my best shot (and maybe make a few jokes along the way).<br>
+            Whether I'm working on a solo project or collaborating with a team, I am committed to delivering high-quality work and exceeding expectations.
+        </p>
+        <p>
+            My key skills are:
+        </p>
+        <ul>
+            <li>Python</li>
+            <li>Flask</li>
+            <li>HTML</li>
+            <li>CSS</li>
+            <li>Java</li>
+            <li>SQL</li>
+        </ul>
+                <h1>Contact</h1>
+        <ul>
+            <li><a id="linktoemail" href="mailto:{{ admin_email }}">By Email</a></li>
+            <li><a id="discord" href="{{ discord_invite }}">Discord</a></li>
+        </ul>
     </div>
+<style>
+    .landing {
+        background-color: var(--colour-background-alt);
+        padding: 1rem;
+        margin: 0 1rem;
+    }
+
+    .landing h1 {
+        color: var(--colour-primary);
+        border-bottom: 3px solid var(--colour-primary);
+    }
+
+    .landing p {
+        color: var(--colour-text);
+    }
+
+    .landing ul {
+        color: var(--colour-text);
+    }
+
+    .landing li {
+        color: var(--colour-text);
+        list-style-type: none;
+    }
+
+    .landing li::before {
+        content: "•";
+        color: var(--colour-primary);
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+    }
+
+    .landing li {
+        margin-bottom: 0.5rem;
+    }
+
+    .landing li:last-child {
+        margin-bottom: 0;
+    }
+
+    #linktoemail {
+        color: var(--colour-primary);
+    }
+
+    #discord {
+        color: var(--colour-primary);
+    }
+
+
+
+</style>
 {% endblock body %}

@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock head %}
+
 {% block body %}
-    <div class="container">
-        <h1>Home</h1>
+<div class="container">
+    <div class="landing">
+        <h1>Are you looking for a Developer<span class="my_name">?</span></h1>
+        <p>My name is <span class="my_name">Alyce Osbourne</span> and I may be the one you are looking for!</p>
+        <a href="/about" class="learn_more_button">Learn More</a>
     </div>
+</div>
 {% endblock body %}

@@ -1,0 +1,42 @@
+    /* the list flicks between the 3 items, and the headers are either side of the list. uses animations to make it look nice */
+    .landing {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 70vh;
+    }
+    .landing h1 {
+        font-size: 3rem;
+        margin-bottom: 0;
+    }
+    .landing p {
+        font-size: 1.5rem;
+        margin-top: 0;
+    }
+
+    .my_name {
+        color: var(--colour-primary);
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .my_name:hover {
+        color: var(--colour-secondary);
+    }
+
+    .learn_more_button {
+        text-decoration: none;
+        color: var(--colour-primary);
+        font-weight: bold;
+        font-size: 1.5rem;
+        padding: 0.5rem 1rem;
+        border: 2px solid var(--colour-primary);
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .learn_more_button:hover {
+        border: 2px solid var(--colour-secondary);
+        color: var(--colour-white);
+    }

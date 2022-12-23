@@ -2,20 +2,18 @@ import os
 import re
 from datetime import datetime
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from markdown import markdown
 from markupsafe import Markup
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from dotenv import load_dotenv
-from pygments.lexers import get_all_lexers, get_lexer_by_name
-from pygments.styles import get_all_styles
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
+from pygments.lexers import get_lexer_by_name
 
 load_dotenv()
-
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///db.sqlite'
@@ -24,12 +22,12 @@ app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME') or 'admin'
 app.config['ADMIN_PASSWORD'] = generate_password_hash(os.environ.get('ADMIN_PASSWORD') or 'admin')
 app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL') or 'admin@site.com'
 app.config['GITHUB_PAGE'] = os.environ.get('GITHUB_PAGE') or 'github.com/username/repo'
+app.config['DISCORD_INVITE'] = os.environ.get('DISCORD_INVITE') or 'discord.gg/invite'
+app.config['CODEPEN_PAGE'] = os.environ.get('CODEPEN_PAGE') or 'codepen.io/username'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.login_message = 'Please login to access this page.'
-login_manager.login_message_category = 'info'
 
 db = SQLAlchemy(app)
 
@@ -88,7 +86,7 @@ def index():
 @app.route('/blog')
 def blog():
     posts = Post.query.order_by(Post.date.desc()).all()
-    return render_template('blog/blog.html', posts = posts)
+    return render_template('pages/blog.html', posts = posts)
 
 
 @app.route('/post/<int:post_id>')
@@ -101,10 +99,14 @@ def post(post_id):
 @login_required
 def create():
     if request.method == 'POST':
-        db.session.add(Post(request.form['title'], request.form['content']))
-        db.session.commit()
-        post_id = Post.query.order_by(Post.date.desc()).first().id
-        return redirect(url_for('post', post_id = post_id))
+        post = Post(request.form['title'], request.form['content'])
+        if request.form['title'] and request.form['content']:
+            db.session.add(post)
+            db.session.commit()
+            post_id = Post.query.order_by(Post.date.desc()).first().id
+            return redirect(url_for('post', post_id = post_id))
+        else:
+            return render_template('blog/update.html', post = post, error = 'Title and content are required')
     return render_template('blog/create.html')
 
 
@@ -134,11 +136,6 @@ def about():
     return render_template('pages/about.html')
 
 
-@app.route('/contact')
-def contact():
-    return render_template('pages/contact.html')
-
-
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -164,8 +161,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-# filter to render text as markdown, with syntax highlighting.
-# add css for the highlighting to the highlighted.css file.
 @app.template_filter('markdown')
 def highlight_filter(s):
     pattern = re.compile(r'```(\w+)?\s*([\s\S]+?)\s*```')
@@ -182,6 +177,38 @@ def highlight_filter(s):
     return Markup(markdown(formatted))
 
 
+@app.context_processor
+def num_posts():
+    return dict(num_posts = Post.query.count())
+
+
+@app.context_processor
+def github_page():
+    return dict(github_page = app.config['GITHUB_PAGE'])
+
+
+@app.context_processor
+def codepen_page():
+    return dict(codepen_page = app.config['CODEPEN_PAGE'])
+
+
+@app.context_processor
+def admin_username():
+    return dict(admin_username = app.config['ADMIN_USERNAME'])
+
+
+@app.context_processor
+def admin_email():
+    return dict(admin_email = app.config['ADMIN_EMAIL'])
+
+
+@app.context_processor
+def most_recent_post():
+    return dict(most_recent_post = url_for('post', post_id = Post.query.order_by(Post.date.desc()).first().id))
+
+@app.context_processor
+def discord_invite():
+    return dict(discord_invite = app.config['DISCORD_INVITE'])
 if __name__ == '__main__':
     app.run(
             debug = True,
