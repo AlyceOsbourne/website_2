@@ -1,0 +1,27 @@
+:root{
+    --colour-background: #08090A;
+    --colour-background-alt: #222823;
+    --colour-primary: #E8C547;
+    --colour-secondary: #087CA7;
+    --colour-text: #fff;
+    --colour-alt-text: #000;
+    padding: auto;
+    margin: auto;
+    background-color: var(--colour-background);
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
+    color: var(--colour-text);
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.body {
+    padding: 1rem 2rem;
+}
+
+

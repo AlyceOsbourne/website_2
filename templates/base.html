@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>{% block title %}My Blog{% endblock %}</title>
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+        {% block head %}
+        {% endblock head%}
+
+    </head>
+    <body>
+        {% include 'elements/navbar.html' %}
+        <div class="body">
+            {% block body %}
+            {% endblock body %}
+        </div>
+        {% include 'elements/footer.html' %}
+    </body>
+    {% block scripts %} {% endblock scripts %}
+</html>

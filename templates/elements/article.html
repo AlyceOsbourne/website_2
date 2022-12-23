@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/article.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/highlighted.css') }}">
+<article>
+    <h2 class="title">{{ post.title }}</h2>
+    <small class="date">{{ post.date.strftime('%B %d, %Y') }}</small>
+    <div class="content">
+        <p>{{ post.content | markdown}}</p>
+    </div>
+    <small class="author">By {{ post.author }}</small>
+    {% if current_user.is_authenticated %}
+    <div class="buttons">
+        <a class="button" href="{{ url_for('update', post_id=post.id) }}">Update</a>
+        <a class="button" href="{{ url_for('delete', post_id=post.id) }}">Delete</a>
+    </div>
+    {% endif %}
+</article>

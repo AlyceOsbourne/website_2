@@ -1,0 +1,12 @@
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    background-color: var(--colour-background-alt);
+    border-top: 10px solid var(--colour-primary);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
