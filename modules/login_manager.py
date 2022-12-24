@@ -46,7 +46,7 @@ def login():
         if username == current_app.config['ADMIN_USERNAME'] and check_password_hash(
                 current_app.config['ADMIN_PASSWORD'], password):
             if login_user(Admin(username, password)):
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('page_routes.dashboard'))
         return redirect(url_for('login', failed = True))
     return render_template('screens/login.html')
 
@@ -55,4 +55,4 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('page_routes.index'))

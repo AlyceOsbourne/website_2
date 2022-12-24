@@ -10,26 +10,35 @@ from modules.modals import db
 from modules.routes import page_routes
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv("instance/.env")
+app_environ_defaults = {
+    "SQLALCHEMY_DATABASE_URI": "sqlite:///db.sqlite",
+    "SECRET_KEY": "change_me",
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD": generate_password_hash("admin"),
+    "ADMIN_EMAIL": "admin@site.com",
+    "GITHUB_PAGE": "github.com/username/repo",
+    "DISCORD_INVITE": "discord.gg/invite",
+    "CODEPEN_PAGE": "codepen.io/username",
+}
+blueprints = [login_routes, blog_routes, page_routes, filters, context_processors]
+
+
+def setup_environment(app):
+    for key, value in app_environ_defaults.items():
+        app.config[key] = os.environ.get(key) or value
+
+
+def register_blueprints(app):
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
 
 
 def setup_app(app):
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///db.sqlite'
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'change_me'
-    app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME') or 'admin'
-    app.config['ADMIN_PASSWORD'] = generate_password_hash(os.environ.get('ADMIN_PASSWORD') or 'admin')
-    app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL') or 'admin@site.com'
-    app.config['GITHUB_PAGE'] = os.environ.get('GITHUB_PAGE') or 'github.com/username/repo'
-    app.config['DISCORD_INVITE'] = os.environ.get('DISCORD_INVITE') or 'discord.gg/invite'
-    app.config['CODEPEN_PAGE'] = os.environ.get('CODEPEN_PAGE') or 'codepen.io/username'
-    app.register_blueprint(login_routes)
-    app.register_blueprint(blog_routes)
-    app.register_blueprint(page_routes)
-    app.register_blueprint(filters)
-    app.register_blueprint(context_processors)
     with app.app_context():
+        setup_environment(app)
+        register_blueprints(app)
         login_manager.init_app(app)
         db.init_app(app)
         db.create_all()
-
     return app

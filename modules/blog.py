@@ -6,15 +6,13 @@ from .modals import db, Post
 blog_routes = Blueprint('blog_routes', __name__)
 
 
-
 @blog_routes.route('/blog')
 def blog():
-    posts = Post.query.order_by(Post.date.desc()).all()
-    return render_template('pages/blog.html', posts = posts)
+    return render_template('pages/blog.html', posts = Post.query.order_by(Post.date.desc()).all())
 
 
 @blog_routes.route('/post/<int:post_id>')
-def post(post_id):
+def get_post(post_id):
     return render_template('blog/post.html', post = Post.query.get_or_404(post_id))
 
 
@@ -28,7 +26,7 @@ def create():
             db.session.add(post)
             db.session.commit()
             post_id = Post.query.order_by(Post.date.desc()).first().id
-            return redirect(url_for('post', post_id = post_id))
+            return redirect(url_for('blog_routes.get_post', post_id = post_id))
         else:
             return render_template('blog/update.html', post = post, error = 'Title and content are required')
     return render_template('blog/create.html')
@@ -42,7 +40,7 @@ def update(post_id):
         post.title = request.form['title']
         post.content = request.form['content']
         db.session.commit()
-        return redirect(url_for('post', post_id = post_id))
+        return redirect(url_for('blog_routes.get_post', post_id = post_id))
     return render_template('blog/update.html', post = post)
 
 
@@ -53,4 +51,3 @@ def delete(post_id):
     db.session.delete(post)
     db.session.commit()
     return redirect(url_for('blog'))
-

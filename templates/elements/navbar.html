@@ -7,9 +7,9 @@
         <li><a href="{{ url_for('page_routes.dashboard') }}">Dashboard</a></li>
         <li><a href="{{ url_for('login_routes.logout') }}">Logout</a></li>
         {% else %}
-        <li><a href="{{ url_for('about') }}">About</a></li>
-        <li><a href="{{ github_page }}" target="_blank" rel="noopener noreferrer">GitHub </a></li>
-        <li><a href="{{ codepen_page }}" target="_blank" rel="noopener noreferrer">CodePen </a></li>
+        <li><a href="{{ url_for('page_routes.about') }}">About</a></li>
+        <li><a href="{{ github_page }}" target="_blank" rel="noopener noreferrer nofollow">GitHub </a></li>
+        <li><a href="{{ codepen_page }}" target="_blank" rel="noopener noreferrer nofollow">CodePen </a></li>
         <li><a href="{{ url_for('login_routes.login') }}">Login</a></li>
         {% endif %}
     </ul>
